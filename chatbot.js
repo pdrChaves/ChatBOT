@@ -6,16 +6,14 @@ const client = new Client();
 client.on('qr', qr => {
     qrcode.generate(qr, {small: true});
 });
-// apos isso ele diz que foi tudo certo
+// verificação
 client.on('ready', () => {
     console.log('Tudo certo! WhatsApp conectado.');
 });
-// E inicializa tudo 
+ 
 client.initialize();
 
-const delay = ms => new Promise(res => setTimeout(res, ms)); // Função que usamos para criar o delay entre uma ação e outra
-
-// Funil
+const delay = ms => new Promise(res => setTimeout(res, ms)); // Função delay entre uma ação e outra
 
 client.on('message', async msg => {
 
@@ -23,21 +21,18 @@ client.on('message', async msg => {
 
         const chat = await msg.getChat();
 
-        await delay(3000); //delay de 3 segundos
-        await chat.sendStateTyping(); // Simulando Digitação
-        await delay(3000); //Delay de 3000 milisegundos mais conhecido como 3 segundos
+        await delay(3000); //delay 3 segundos
+        await chat.sendStateTyping(); // Simula Digitação
+        await delay(3000);
         const contact = await msg.getContact(); //Pegando o contato
         const name = contact.pushname; //Pegando o nome do contato
-        await client.sendMessage(msg.from,'Olá! '+ name.split(" ")[0] + 'Sou o assistente virtual da empresa tal. Como posso ajudá-lo hoje? Por favor, digite uma das opções abaixo:\n\n1 - Como funciona\n2 - Valores dos planos\n3 - Benefícios\n4 - Como aderir\n5 - Outras perguntas'); //Primeira mensagem de texto
+        await client.sendMessage(msg.from,'Olá! '+ name.split(" ")[0] + 'Sou o assistente virtual da Doulhe3 arrematei!. Como posso ajudá-lo hoje? Por favor, digite uma das opções abaixo:\n\n1 - Como funciona os leilões? \n2 - Como funciona nossa a nossa acessoria? \n3 - Participar do grupo para receber as melhores oportunidades de imóveis \n4 - Nossas redes sociais \n5 - Atendimento Humanizado'); //Primeira mensagem de texto
         await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(5000); //Delay de 5 segundos
     
         
     }
-
-
-
 
     if (msg.body !== null && msg.body === '1' && msg.from.endsWith('@c.us')) {
         const chat = await msg.getChat();
@@ -46,7 +41,7 @@ client.on('message', async msg => {
         await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'Nosso serviço oferece consultas médicas 24 horas por dia, 7 dias por semana, diretamente pelo WhatsApp.\n\nNão há carência, o que significa que você pode começar a usar nossos serviços imediatamente após a adesão.\n\nOferecemos atendimento médico ilimitado, receitas\n\nAlém disso, temos uma ampla gama de benefícios, incluindo acesso a cursos gratuitos');
+        await client.sendMessage(msg.from, ' .\n');
 
         await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
@@ -119,12 +114,4 @@ client.on('message', async msg => {
 
 
     }
-
-
-
-
-
-
-
-
 });

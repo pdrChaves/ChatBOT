@@ -17,7 +17,7 @@ const delay = ms => new Promise(res => setTimeout(res, ms)); // Função delay e
 
 client.on('message', async msg => {
 
-    if (msg.body.match(/(menu|Menu|dia|tarde|noite|oi|Oi|Olá|olá|ola|Ola)/i) && msg.from.endsWith('@c.us')) {
+    if (msg.body.match(/(dia|tarde|noite|oi|Oi|Olá|olá|ola|Ola|Imovel|imovel|quero saber|Quero saber)/i) && msg.from.endsWith('@c.us')) {
 
         const chat = await msg.getChat();
 
@@ -30,7 +30,6 @@ client.on('message', async msg => {
         await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(5000); //Delay de 5 segundos
-    
         
     }
 
@@ -46,12 +45,12 @@ client.on('message', async msg => {
         await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'COMO FUNCIONA?\nÉ muito simples.\n\n1º Passo\nFaça seu cadastro e escolha o plano que desejar.\n\n2º Passo\nApós efetuar o pagamento do plano escolhido você já terá acesso a nossa área exclusiva para começar seu atendimento na mesma hora.\n\n3º Passo\nSempre que precisar');
+        await client.sendMessage(msg.from, 'COMO FUNCIONA?\nÉ muito simples.\n\n1º Passo\nPRIMEIRO PASSO.\n\n2º Passo\nSEGUNDO PASSO.\n\n3º Passo\nTERCEIRO PASSO');
 
         await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'Link para cadastro: https://site.com');
+        await client.sendMessage(msg.from, 'Link para cadastro: https://doulhe3arrematei.com.br');
 
 
     }
@@ -63,12 +62,12 @@ client.on('message', async msg => {
         await delay(3000); //Delay de 3000 milisegundos mais conhecido como 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, '*Plano Individual:* R$22,50 por mês.\n\n*Plano Família:* R$39,90 por mês, inclui você mais 3 dependentes.\n\n*Plano TOP Individual:* R$42,50 por mês, com benefícios adicionais como\n\n*Plano TOP Família:* R$79,90 por mês, inclui você mais 3 dependentes');
+        await client.sendMessage(msg.from, 'TEXTO QUEM SOMOS');
 
         await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'Link para cadastro: https://site.com');
+        await client.sendMessage(msg.from, 'Link para cadastro: https://doulhe3arrematei.com.br');
     }
 
     if (msg.body !== null && msg.body === '3' && msg.from.endsWith('@c.us')) {
@@ -78,13 +77,12 @@ client.on('message', async msg => {
         await delay(3000); //Delay de 3000 milisegundos mais conhecido como 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'Sorteio de em prêmios todo ano.\n\nAtendimento médico ilimitado 24h por dia.\n\nReceitas de medicamentos');
+        await client.sendMessage(msg.from, 'LINK DO GRUPO');
         
         await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'Link para cadastro: https://site.com');
-
+        await client.sendMessage(msg.from, 'Link para cadastro: https://doulhe3arrematei.com.br');
     }
 
     if (msg.body !== null && msg.body === '4' && msg.from.endsWith('@c.us')) {
@@ -93,13 +91,13 @@ client.on('message', async msg => {
         await delay(3000); //Delay de 3000 milisegundos mais conhecido como 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'Você pode aderir aos nossos planos diretamente pelo nosso site ou pelo WhatsApp.\n\nApós a adesão, você terá acesso imediato');
+        await client.sendMessage(msg.from, ' REDES SOCIAIS ');
 
 
         await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'Link para cadastro: https://site.com');
+        await client.sendMessage(msg.from, 'Link para cadastro: https://doulhe3arrematei.com.br');
 
 
     }
@@ -110,8 +108,7 @@ client.on('message', async msg => {
         await delay(3000); //Delay de 3000 milisegundos mais conhecido como 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'Se você tiver outras dúvidas ou precisar de mais informações, por favor, fale aqui nesse whatsapp ou visite nosso site: https://site.com ');
-
+        await client.sendMessage(msg.from, 'Se você tiver outras dúvidas ou precisar de mais informações, por favor, fale aqui nesse whatsapp ou visite nosso site: https://doulhe3arrematei.com.br ');
 
     }
 });

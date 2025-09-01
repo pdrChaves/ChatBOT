@@ -21,15 +21,12 @@ client.on('message', async msg => {
 
         const chat = await msg.getChat();
 
-        await delay(3000); //delay 3 segundos
+        await delay(2000); //delay 3 segundos
         await chat.sendStateTyping(); // Simula Digitação
-        await delay(3000);
         const contact = await msg.getContact(); //Pegando o contato
         const name = contact.pushname; //Pegando o nome do contato
-        await client.sendMessage(msg.from,'Olá! '+ name.split(" ")[0] + 'Sou o assistente virtual da Doulhe3 arrematei!. Como posso ajudá-lo hoje? Por favor, digite uma das opções abaixo:\n\n1 - Como funciona os leilões? \n2 - Como funciona nossa a nossa acessoria? \n3 - Participar do grupo para receber as melhores oportunidades de imóveis \n4 - Nossas redes sociais \n5 - Atendimento Humanizado'); //Primeira mensagem de texto
-        await delay(3000); //delay de 3 segundos
-        await chat.sendStateTyping(); // Simulando Digitação
-        await delay(5000); //Delay de 5 segundos
+        await delay(3000);
+        await client.sendMessage(msg.from,'Olá! '+ name.split(" ")[0] + ', sou o assistente virtual da Doulhe3 arrematei!. Como posso ajudá-lo hoje? Por favor, digite uma das opções abaixo:\n\n1 - Como funciona os leilões? \n2 - Como funciona nossa a nossa acessoria? \n3 - Participar do grupo para receber as melhores oportunidades de imóveis \n4 - Nossas redes sociais \n5 - Atendimento Humanizado'); //Primeira mensagem de texto
         
     }
 
@@ -40,18 +37,17 @@ client.on('message', async msg => {
         await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, ' .\n');
+        await client.sendMessage(msg.from, 'A opção 1 está funcionando \n');
 
-        await delay(3000); //delay de 3 segundos
+        await delay(2000); //delay de 2 segundos
         await chat.sendStateTyping(); // Simulando Digitação
-        await delay(3000);
         await client.sendMessage(msg.from, 'COMO FUNCIONA?\nÉ muito simples.\n\n1º Passo\nPRIMEIRO PASSO.\n\n2º Passo\nSEGUNDO PASSO.\n\n3º Passo\nTERCEIRO PASSO');
 
-        await delay(3000); //delay de 3 segundos
+        /*await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'Link para cadastro: https://doulhe3arrematei.com.br');
-
+        await client.sendMessage(msg.from, 'Acesse nosso site para mais saber: https://doulhe3arrematei.com.br');
+        */
 
     }
 
@@ -64,10 +60,10 @@ client.on('message', async msg => {
         await delay(3000);
         await client.sendMessage(msg.from, 'TEXTO QUEM SOMOS');
 
-        await delay(3000); //delay de 3 segundos
+        /*await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'Link para cadastro: https://doulhe3arrematei.com.br');
+        */
     }
 
     if (msg.body !== null && msg.body === '3' && msg.from.endsWith('@c.us')) {
@@ -77,12 +73,14 @@ client.on('message', async msg => {
         await delay(3000); //Delay de 3000 milisegundos mais conhecido como 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, 'LINK DO GRUPO');
+        await client.sendMessage(msg.from, 'Link do nosso grupo de oportunidades: https://chat.whatsapp.com/FDTNyTiSibq6Qq2l6csJpw');
         
+        /*
         await delay(3000); //delay de 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
         await client.sendMessage(msg.from, 'Link para cadastro: https://doulhe3arrematei.com.br');
+        */
     }
 
     if (msg.body !== null && msg.body === '4' && msg.from.endsWith('@c.us')) {
@@ -91,14 +89,7 @@ client.on('message', async msg => {
         await delay(3000); //Delay de 3000 milisegundos mais conhecido como 3 segundos
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
-        await client.sendMessage(msg.from, ' REDES SOCIAIS ');
-
-
-        await delay(3000); //delay de 3 segundos
-        await chat.sendStateTyping(); // Simulando Digitação
-        await delay(3000);
-        await client.sendMessage(msg.from, 'Link para cadastro: https://doulhe3arrematei.com.br');
-
+        await client.sendMessage(msg.from, 'Nossas redes sociais\nInstagram: https://www.instagram.com/doulhe_3_arrematei \nFacebook: https://www.facebook.com/profile.php?id=61567777044020 \nSite: https://www.doulhe3arrematei.com.br/');
 
     }
 

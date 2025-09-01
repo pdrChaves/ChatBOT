@@ -26,7 +26,7 @@ client.on('message', async msg => {
         const contact = await msg.getContact(); //Pegando o contato
         const name = contact.pushname; //Pegando o nome do contato
         await delay(3000);
-        await client.sendMessage(msg.from,'Olá! '+ name.split(" ")[0] + ', sou o assistente virtual da Dou-lhe3 arrematei!. Como posso ajudá-lo hoje? Por favor, digite uma das opções abaixo:\n\n1 - Como funciona os leilões? \n2 - Como funciona nossa a nossa acessoria? \n3 - Participar do grupo para receber as melhores oportunidades de imóveis \n4 - Nossas redes sociais \n5 - Quanto custa nosso serviço\n 6 - Atendimento Humanizado'); //Primeira mensagem de texto
+        await client.sendMessage(msg.from,'Olá! '+ name.split(" ")[0] + ', sou o assistente virtual da Dou-lhe3 arrematei!. Como posso ajudá-lo hoje? Por favor, digite uma das opções abaixo:\n\n1 - Como funciona os leilões? \n2 - Como funciona nossa a nossa acessoria? \n3 - Participar do grupo para receber as melhores oportunidades de imóveis \n4 - Nossas redes sociais \n5 - Quanto é o investimento em nossos serviços?\n 6 - Atendimento Humanizado'); //Primeira mensagem de texto
         
     }
 
@@ -44,7 +44,7 @@ client.on('message', async msg => {
         const chat = await msg.getChat();
 
 
-        await delay(3000); //Delay de 3000 milisegundos mais conhecido como 3 segundos
+        await delay(3000); 
         await chat.sendStateTyping(); // Simulando Digitação
         await delay(3000);
         await client.sendMessage(msg.from, 'Nossa assessoria te acompanha e orienta em todas as etapas do processo:\n🧐 Fazemos uma análise minuciosa do edital, identificando todos os pontos importantes, possíveis pendências e riscos do imóvel;\n🎯 Montamos uma estratégia de lance personalizada;\n📝 Formalizamos tudo com contrato e transparência;\n📌 Ajudamos você a se cadastrar no site do leiloeiro;\n🤝 Acompanhamos até você conseguir a posse do imóvel. \n\nÉ um serviço completo e você só paga se arrematar!');
@@ -80,6 +80,7 @@ client.on('message', async msg => {
         await delay(3000);
         await client.sendMessage(msg.from, "O valor da nossa assessoria varia conforme o valor do imóvel:\n\n- Imóveis de até R$ 500.000,00: cobramos 10% sobre o valor arrematado\n- Imóveis acima de R$ 500.000,00: cobramos 5% sobre o valor arrematado\n\nE o melhor: se o imóvel não for arrematado, você não paga nada.\nTudo é formalizado com um contrato de prestação de serviços, garantindo total transparência e segurança jurídica.");
     }
+
     if (msg.body !== null && msg.body === '6' && msg.from.endsWith('@c.us')){
         /*
         await delay(2000);

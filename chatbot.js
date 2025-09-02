@@ -101,16 +101,19 @@ client.on('message', async msg => {
         const chat = await msg.getChat();
         await delay(1000); 
         await chat.sendStateTyping(); 
-        await delay(2000);
+        await delay(1000);
         await client.sendMessage(msg.from, 'Aqui estão nossas redes sociais! para você ficar por dentro de tudo que rola no mundo dos leilões!');
+        await delay(1000);
         await chat.sendStateTyping(); 
-        await delay(2000);
+        await delay(1000);
         await client.sendMessage(msg.from, 'Instagram: https://www.instagram.com/doulhe_3_arrematei');
+        await delay(1000);
         await chat.sendStateTyping(); 
-        await delay(2000);
+        await delay(1000);
         await client.sendMessage(msg.from, 'Facebook: https://www.facebook.com/profile.php?id=61567777044020');
+        await delay(1000);
         await chat.sendStateTyping(); 
-        await delay(2000);
+        await delay(1000);
         await client.sendMessage(msg.from, 'Site: https://www.doulhe3arrematei.com.br/');
     } 
     else if (msg.body === '5' && userId.endsWith('@c.us')) {
@@ -128,9 +131,52 @@ client.on('message', async msg => {
         await delay(1000);
         await chat.sendStateTyping();
         await delay(2000);
-        await client.sendMessage(msg.from, 'Perfeito! um de nossos atendentes ira te atender assim que possivel.');
+        await client.sendMessage(
+            msg.from,
+            '🤝 Atendimento Humanizado confirmado!\n\n' +
+            'Com qual dos nossos atendentes você gostaria de falar?\n' +
+            '1 - Marino\n' +
+            '2 - Samuel\n' +
+            '3 - Sem preferência'
+        );
         
-        // Muda estado para atendimento humano
+        // Muda estado para escolher funcionário
+        userStates.set(userId, "escolherFuncionario");
+    }
+
+    // ======================
+    // ESCOLHA DO FUNCIONÁRIO
+    // ======================
+    else if (userStates.get(userId) === "escolherFuncionario" && userId.endsWith('@c.us')) {
+        let funcionario = "";
+        let funcionarioNum = ""; // número ou grupo no WhatsApp
+
+        switch (msg.body) {
+            case '1':
+                funcionario = "Marino";
+                funcionarioNum = "5512997766363@c.us";
+                break;
+            case '2':
+                funcionario = "Samuel";
+                funcionarioNum = "5512988779303@c.us";
+                break;
+            default:
+                await client.sendMessage(msg.from, "❌ Opção inválida. Digite apenas 1, 2 ou 3 ");
+                return;
+        }
+
+        await client.sendMessage(
+            msg.from,
+            `✅ Entendido! Vou encaminhar seu pedido de atendimento para ${funcionario === "Sem preferência" ? "o grupo da equipe" : funcionario}.`
+        );
+
+        // Notificação para o funcionário ou grupo
+        await client.sendMessage(
+            funcionarioNum,
+            `📢 Novo atendimento!\n\nUsuário: ${msg.from}\nDeseja falar com: ${funcionario}`
+        );
+
+        // Atualiza estado
         userStates.set(userId, "atendimentoHumano");
     }
 });

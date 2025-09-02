@@ -65,69 +65,61 @@ client.on('message', async msg => {
     const now = Date.now();
     const userState = userStates.get(userId) || "novo";
 
-    // ======================
-    // 1. FLUXO DE ESCOLHA DE FUNCIONÁRIO (tem prioridade)
-    // ======================
-    if (userState === "escolherFuncionario" && userId.endsWith('@c.us')) {
-        let funcionario = "";
-        let funcionarioNum = ""; // funcionario ou grupo
-        // @c.us para contatos
-        // @g.us para grupos
+   if (userState === "escolherFuncionario" && userId.endsWith('@c.us')) {
+    let funcionario = "";
+    let funcionarioNum = ""; // funcionário ou grupo
+    // @c.us para contatos
+    // @g.us para grupos
 
-        switch (msg.body) {
-            case '1':
-                funcionario = "Marino Barros";
-                funcionarioNum = "5512997766363@c.us";
-                break;
-            case '2':
-                funcionario = "Samuel Calazans";
-                funcionarioNum = "5512988779303@c.us";
-                break;
-            case '3':
-                funcionario = "Flávio Barros";
-                funcionarioNum = "5512997752750@c.us";
-                break;
-            case '4':
-                funcionario = "a equipe, um momento";
-                funcionarioNum = "120363362518310323@g.us"; 
-                break;
-            default:
-                await client.sendMessage(msg.from, "❌ Opção inválida. Digite apenas 1, 2, 3 ou 4");
-                return;
-        }
-
-        await client.sendMessage(
-            msg.from,
-            `✅ Entendido! Vou encaminhar seu pedido de atendimento para ${funcionario}.`
-        );
-
-        await client.sendMessage(
-            funcionarioNum,
-            `📢 Novo atendimento!\n\nUsuário: ${msg.from}\nDeseja falar com: ${funcionario}`
-        );
-
-        // Reinicia o estado do usuário
-        userStates.set(userId, "novo");
-        userCooldowns.set(userId, 0);
-
-        return; //importante: impede cair no menu principal
-    }
-
-    // ======================
-    // 2. BLOCO DE INTRODUÇÃO
-    // ======================
-    if (
-        msg.body.match(/(dia|tarde|noite|oi|olá|ola|imovel|informação|informacao)/i) &&
-        userId.endsWith('@c.us')
-    ) {
-        const lastInteraction = userCooldowns.get(userId) || 0;
-
-        if (now - lastInteraction > 3600000 || userState === "novo") {
-            await sendIntro(msg);
+    switch (msg.body) {
+        case '1':
+            funcionario = "Marino Barros";
+            funcionarioNum = "5512997766363@c.us";
+            break;
+        case '2':
+            funcionario = "Samuel Calazans";
+            funcionarioNum = "5512988779303@c.us";
+            break;
+        case '3':
+            funcionario = "Flávio Barros";
+            funcionarioNum = "5512997752750@c.us";
+            break;
+        case '4':
+            funcionario = "Sem preferência";
+            funcionarioNum = "120363362518310323@g.us"; 
+            break;
+        default:
+            await client.sendMessage(msg.from, "❌ Opção inválida. Digite apenas 1, 2, 3 ou 4");
             return;
-        }
     }
 
+    // Pega informações do usuário para envio ao funcionário
+    const contact = await msg.getContact();
+    const userName = contact.pushname || "Usuário";
+    const userNumber = msg.from.replace('@c.us', '');
+
+    // Mensagem para o usuário
+    await client.sendMessage(
+        msg.from,
+        `✅ Entendido! Vou encaminhar seu pedido de atendimento para ${funcionario}.`
+    );
+
+    // Mensagem para o funcionário
+    await client.sendMessage(
+        funcionarioNum,
+        `📢 Novo atendimento!\n\n` +
+        `Nome: ${userName}\n` +
+        `Número: +${userNumber}\n` +
+        `Para falar com o cliente, clique aqui: https://wa.me/${userNumber}\n\n` +
+        `Deseja falar com: ${funcionario}`
+    );
+
+    // Reinicia o estado do usuário
+    userStates.set(userId, "novo");
+    userCooldowns.set(userId, 0);
+
+    return; // importante: impede cair no menu principal
+}
     // ======================
     // 3. OPÇÕES DO MENU
     // ======================
@@ -164,7 +156,7 @@ client.on('message', async msg => {
                 await delay(1000); 
                 await chat.sendStateTyping(); 
                 await delay(1000);
-                await client.sendMessage(userId, 'Aqui estão nossas redes sociais!...');
+                await client.sendMessage(userId, 'Aqui estão nossas redes sociais! para você ficar por dentro de tudo que rola no mundo dos leilões');
                 await client.sendMessage(userId, 'Instagram: https://www.instagram.com/doulhe_3_arrematei');
                 await client.sendMessage(userId, 'Facebook: https://www.facebook.com/profile.php?id=61567777044020');
                 await client.sendMessage(userId, 'Site: https://www.doulhe3arrematei.com.br/');

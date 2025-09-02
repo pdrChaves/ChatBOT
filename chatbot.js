@@ -9,16 +9,20 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 // ====== ESTADOS E COOLDOWNS ======
 const userCooldowns = new Map(); // { '551199999999@c.us': timestamp }
 const userStates = new Map(); // { '551199999999@c.us': 'menu' }
+const userInitiated = new Map(); // marca se o usuário iniciou a conversa
+
+// ====== PALAVRAS-CHAVE PARA ATIVAR O BOT ======
+const triggerKeywords = ['olá', 'Olá', 'ola', 'Ola', 'Oi',  'oi', 'dia', 'tarde', 'noite', 'atendimento']; 
 
 // ====== INICIALIZAÇÃO DO CLIENTE ======
 client.on('qr', qr => {
     qrcode.generate(qr, { small: true });
 });
- // ====== CONFIRMAÇÃO DE LOGIN =====
+
+// ====== CONFIRMAÇÃO DE LOGIN ======
 client.on('ready', async () => {
     console.log('✅ Tudo certo! WhatsApp conectado.');
 
-    // Lista todos os grupos para pegar o ID
     const chats = await client.getChats();
     const grupos = chats.filter(chat => chat.isGroup);
 
@@ -51,7 +55,6 @@ async function sendIntro(msg) {
         `5 - Quanto é o investimento em nossos serviços?\n` +
         `6 - Atendimento Humanizado`
     );
-
     userCooldowns.set(msg.from, Date.now());
     userStates.set(msg.from, "menu");
 }
@@ -187,22 +190,27 @@ async function handleMenu(msg) {
 client.on('message', async msg => {
     const userId = msg.from;
     const userState = userStates.get(userId) || "novo";
+    const text = msg.body.toLowerCase();
 
-    // ======= CHAMA SENDINTRO AUTOMATICAMENTE =======
-    if(userState === "novo" && msg.from.endsWith('@c.us')) {
-        await sendIntro(msg);
+    // ======= SE USUÁRIO JÁ ESTÁ EM CONVERSA =======
+    if (userState !== "novo" && userId.endsWith('@c.us')) {
+        if (userState === "escolherFuncionario") {
+            await handleFuncionario(msg);
+        } else if (userState === "menu") {
+            await handleMenu(msg);
+        }
         return;
     }
 
-    // ======= ESCOLHA DE FUNCIONÁRIO =======
-    if(userState === "escolherFuncionario" && userId.endsWith('@c.us')) {
-        await handleFuncionario(msg);
-        return;
-    }
+    // ======= CHECA SE O USUÁRIO INICIOU A CONVERSA =======
+    if (!userInitiated.get(userId)) {
+        // Usuário enviou a primeira mensagem
+        userInitiated.set(userId, true);
 
-    // ======= MENU PRINCIPAL =======
-    if(userState === "menu" && userId.endsWith('@c.us')) {
-        await handleMenu(msg);
-        return;
+        // ======= CHECA PALAVRA-CHAVE PARA ATIVAR O BOT =======
+        const hasTrigger = triggerKeywords.some(keyword => text.includes(keyword));
+        if (hasTrigger && userState === "novo" && userId.endsWith('@c.us')) {
+            await sendIntro(msg);
+        }
     }
 });

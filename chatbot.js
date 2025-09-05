@@ -71,7 +71,7 @@ async function sendIntro(msg) {
         `Olá, ${name.split(" ")[0]}! Sou o assistente virtual da Dou-lhe3 arrematei! Como posso ajudá-lo hoje?\n\n` +
         `1 - Como funciona os leilões?\n` +
         `2 - Como funciona nossa assessoria?\n` +
-        `3 - Participar do grupo para receber as melhores oportunidades de imóveis\n` +
+        `3 - Grupo de Oportunidades Dou-lhe 3 Arrematei\n` +
         `4 - Nossas redes sociais\n` +
         `5 - Qual o valor da assessoria?\n` +
         `6 - Atendimento Humanizado\n\n` +
@@ -104,7 +104,6 @@ async function handleFuncionario(msg) {
             funcionarioNum = "120363362518310323@g.us"; 
             break;
         default:
-            await client.sendMessage(msg.from, "❌ Opção inválida. Digite apenas 1, 2, 3 ou 4\n\n➡️ Digite *0* para voltar ao menu.");
             return;
     }
 
@@ -162,10 +161,7 @@ async function handleMenu(msg) {
             break;
         case '4':
             await chat.sendStateTyping(); await delay(1000);
-            await client.sendMessage(msg.from, 'Aqui estão nossas redes sociais:');
-            await client.sendMessage(msg.from, 'Instagram: https://www.instagram.com/doulhe_3_arrematei');
-            await client.sendMessage(msg.from, 'Facebook: https://www.facebook.com/profile.php?id=61567777044020');
-            await client.sendMessage(msg.from, 'Site: https://www.doulhe3arrematei.com.br/\n\n➡️ Digite *0* para voltar ao menu.');
+            await client.sendMessage(msg.from, 'Aqui estão nossas redes sociais: \nInstagram: https://www.instagram.com/doulhe_3_arrematei \nFacebook: https://www.facebook.com/profile.php?id=61567777044020 \nSite: https://www.doulhe3arrematei.com.br/\n\n➡️ Digite *0* para voltar ao menu.');
             break;
         case '5':
             await chat.sendStateTyping(); await delay(2000);
@@ -186,7 +182,6 @@ async function handleMenu(msg) {
             break;
         default:
             await client.sendMessage(msg.from, 
-                "❌ Não entendi sua mensagem.\n\nDigite um número do menu ou *0* para voltar.\nSe preferir, digite *6* para falar com um atendente."
             );
             break;
     }

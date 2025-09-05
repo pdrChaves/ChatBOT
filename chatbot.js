@@ -9,8 +9,7 @@ const client = new Client({
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
-// ====== ESTADOS E COOLDOWNS ======
-const userCooldowns = new Map(); // { '551199999999@c.us': timestamp }
+// ====== ESTADOS ======
 const userStates = new Map();    // { '551199999999@c.us': 'menu' | 'escolherFuncionario' | 'handover' | 'novo' }
 const userInitiated = new Map(); // marca se o usuário iniciou a conversa
 const triggerKeywords = ['olá','ola','oi','dia','tarde','noite','atendimento'];
@@ -77,7 +76,6 @@ async function sendIntro(msg) {
         `6 - Atendimento Humanizado\n\n` +
         `➡️ Digite *0* a qualquer momento para voltar a este menu.`
     );
-    userCooldowns.set(msg.from, Date.now());
     userStates.set(msg.from, "menu");
 }
 
@@ -181,8 +179,6 @@ async function handleMenu(msg) {
             userStates.set(msg.from, "escolherFuncionario");
             break;
         default:
-            await client.sendMessage(msg.from, 
-            );
             break;
     }
 }
@@ -194,11 +190,6 @@ client.on('message', async msg => {
     const text = msg.body.toLowerCase();
 
     if (msg.fromMe) return; // ignora mensagens do próprio bot
-
-    // Cooldown de 20 segundos
-    const cooldown = 20 * 1000; 
-    const lastMsg = userCooldowns.get(userId) || 0;
-    if (Date.now() - lastMsg < cooldown && userState !== "handover") return;
 
     if (msg.body.trim() === '0' && userId.endsWith('@c.us')) {
         await sendIntro(msg);
@@ -213,11 +204,10 @@ client.on('message', async msg => {
         return;
     } else if (userState === "menu") {
         await handleMenu(msg);
-        userCooldowns.set(userId, Date.now());
         return;
     }
 
-    // ======= PRIMEIRA INTERAÇÃO =======
+    // define o usuário como primeira interação
     if (!userInitiated.get(userId)) {
         userInitiated.set(userId, true);
         const hasTrigger = triggerKeywords.some(keyword => text.includes(keyword));

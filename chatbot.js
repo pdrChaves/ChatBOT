@@ -1,25 +1,20 @@
-// ====== IMPORTS ======
 const qrcode = require('qrcode-terminal');
 const { Client, Buttons, List, MessageMedia } = require('whatsapp-web.js');
 const client = new Client();
 
-// ====== FUNÇÃO DE DELAY ======
-const delay = ms => new Promise(res => setTimeout(res, ms));
+const delay = ms => new Promise(res => setTimeout(res, ms)); //delay
 
 // ====== ESTADOS E COOLDOWNS ======
 const userCooldowns = new Map(); // { '551199999999@c.us': timestamp }
 const userStates = new Map(); // { '551199999999@c.us': 'menu' }
 const userInitiated = new Map(); // marca se o usuário iniciou a conversa
 
-// ====== PALAVRAS-CHAVE PARA ATIVAR O BOT ======
-const triggerKeywords = ['olá', 'Olá', 'ola', 'Ola', 'Oi',  'oi', 'dia', 'tarde', 'noite', 'atendimento']; 
+const triggerKeywords = ['olá', 'Olá', 'ola', 'Ola', 'Oi',  'oi', 'dia', 'tarde', 'noite', 'atendimento']; //palavras que ativam o bot
 
-// ====== INICIALIZAÇÃO DO CLIENTE ======
 client.on('qr', qr => {
     qrcode.generate(qr, { small: true });
-});
+}); //qr code para conectar
 
-// ====== CONFIRMAÇÃO DE LOGIN ======
 client.on('ready', async () => {
     console.log('✅ Tudo certo! WhatsApp conectado.');
 
@@ -36,7 +31,7 @@ client.on('ready', async () => {
 
 client.initialize();
 
-// ====== FUNÇÃO DE MENU INICIAL ======
+// ====== MENU INICIAL ======
 async function sendIntro(msg) {
     const chat = await msg.getChat();
     const contact = await msg.getContact();
@@ -53,13 +48,14 @@ async function sendIntro(msg) {
         `3 - Participar do grupo para receber as melhores oportunidades de imóveis\n` +
         `4 - Nossas redes sociais\n` +
         `5 - Quanto é o investimento em nossos serviços?\n` +
-        `6 - Atendimento Humanizado`
+        `6 - Atendimento Humanizado\n\n` +
+        `➡️ Digite *0* a qualquer momento para voltar a este menu.`
     );
     userCooldowns.set(msg.from, Date.now());
     userStates.set(msg.from, "menu");
 }
 
-// ====== FUNÇÃO PARA ESCOLHA DE FUNCIONÁRIO ======
+// ====== ESCOLHA DE FUNCIONÁRIO ======
 async function handleFuncionario(msg) {
     let funcionario = "";
     let funcionarioNum = "";
@@ -82,7 +78,7 @@ async function handleFuncionario(msg) {
             funcionarioNum = "120363362518310323@g.us";
             break;
         default:
-            await client.sendMessage(msg.from, "❌ Opção inválida. Digite apenas 1, 2, 3 ou 4");
+            await client.sendMessage(msg.from, "❌ Opção inválida. Digite apenas 1, 2, 3 ou 4\n\n➡️ Digite *0* para voltar ao menu.");
             return;
     }
 
@@ -93,7 +89,7 @@ async function handleFuncionario(msg) {
     // Mensagem para o usuário
     await client.sendMessage(
         msg.from,
-        `✅ Entendido! Vou encaminhar seu pedido de atendimento para ${funcionario}.`
+        `✅ Entendido! Vou encaminhar seu pedido de atendimento para ${funcionario}.\n\n➡️ Digite *0* para voltar ao menu.`
     );
 
     // Mensagem para o funcionário
@@ -111,7 +107,7 @@ async function handleFuncionario(msg) {
     userCooldowns.set(msg.from, 0);
 }
 
-// ====== FUNÇÃO PARA MENU PRINCIPAL ======
+// ====== MENU PRINCIPAL ======
 async function handleMenu(msg) {
     const chat = await msg.getChat();
     const option = msg.body.trim();
@@ -122,10 +118,10 @@ async function handleMenu(msg) {
             await delay(2000);
             await client.sendMessage(
                 msg.from,
-                '🏠 Leilão de imóveis é uma forma de comprar imóveis por preços abaixo do mercado. \n' +
-                '⚖️ Pode ser judicial (quando o bem é penhorado por dívidas) ou extrajudicial (quando o banco retoma por falta de pagamento). \n' +
-                '📌 Funciona assim: é publicado um edital com todas as regras → acontece o 1º leilão (valor de avaliação) → se não vender, vai para o 2º leilão (com valor mínimo menor). \n' +
-                '💰 Quem dá o maior lance, leva.'
+                '🏠 Leilão de imóveis é uma forma de comprar imóveis por preços abaixo do mercado.\n' +
+                '⚖️ Pode ser judicial (quando o bem é penhorado por dívidas) ou extrajudicial (quando o banco retoma por falta de pagamento).\n' +
+                '📌 Funciona assim: é publicado um edital → acontece o 1º leilão (valor de avaliação) → se não vender, vai para o 2º leilão (valor mínimo menor).\n' +
+                '💰 Quem dá o maior lance, leva.\n\n➡️ Digite *0* para voltar ao menu.'
             );
             break;
         case '2':
@@ -133,20 +129,19 @@ async function handleMenu(msg) {
             await delay(2000);
             await client.sendMessage(
                 msg.from,
-                'Nossa assessoria te acompanha e orienta em todas as etapas do processo:\n' +
-                '🧐 Fazemos uma análise minuciosa do edital, identificando todos os pontos importantes, possíveis pendências e riscos do imóvel;\n' +
-                '🎯 Montamos uma estratégia de lance personalizada;\n' +
-                '📝 Formalizamos tudo com contrato e transparência;\n' +
+                'Nossa assessoria te acompanha em todas as etapas do processo:\n' +
+                '🧐 Analisamos o edital e os riscos;\n' +
+                '🎯 Montamos estratégia de lance personalizada;\n' +
                 '📌 Ajudamos você a se cadastrar no site do leiloeiro;\n' +
                 '🤝 Acompanhamos até você conseguir a posse do imóvel.\n\n' +
-                'É um serviço completo e você só paga se arrematar!'
+                'Você só paga se arrematar!\n\n➡️ Digite *0* para voltar ao menu.'
             );
             break;
         case '3':
             await chat.sendStateTyping();
             await delay(2000);
-            await client.sendMessage(msg.from, 'Seja bem vindo(a) ao nosso grupo!!');
-            await client.sendMessage(msg.from, 'Link: https://chat.whatsapp.com/FDTNyTiSibq6Qq2l6csJpw');
+            await client.sendMessage(msg.from, 'Seja bem-vindo(a) ao nosso grupo!!');
+            await client.sendMessage(msg.from, '👉 Link: https://chat.whatsapp.com/FDTNyTiSibq6Qq2l6csJpw\n\n➡️ Digite *0* para voltar ao menu.');
             break;
         case '4':
             await chat.sendStateTyping();
@@ -154,16 +149,18 @@ async function handleMenu(msg) {
             await client.sendMessage(msg.from, 'Aqui estão nossas redes sociais:');
             await client.sendMessage(msg.from, 'Instagram: https://www.instagram.com/doulhe_3_arrematei');
             await client.sendMessage(msg.from, 'Facebook: https://www.facebook.com/profile.php?id=61567777044020');
-            await client.sendMessage(msg.from, 'Site: https://www.doulhe3arrematei.com.br/');
+            await client.sendMessage(msg.from, 'Site: https://www.doulhe3arrematei.com.br/\n\n➡️ Digite *0* para voltar ao menu.');
             break;
         case '5':
             await chat.sendStateTyping();
             await delay(2000);
-            await client.sendMessage(msg.from, 'O valor da nossa assessoria varia conforme o valor do imóvel:\n\n' +
-                '- Imóveis de até R$ 500.000,00: cobramos 10% sobre o valor arrematado\n' +
-                '- Imóveis acima de R$ 500.000,00: cobramos 5% sobre o valor arrematado\n\n' +
-                'Se o imóvel não for arrematado, você não paga nada.\n' +
-                'Tudo formalizado com contrato de prestação de serviços.'
+            await client.sendMessage(
+                msg.from,
+                'O valor da nossa assessoria varia conforme o imóvel:\n\n' +
+                '- Até R$ 500.000,00: 10% sobre o arremate\n' +
+                '- Acima de R$ 500.000,00: 5% sobre o arremate\n\n' +
+                'Se não arrematar, não paga nada.\n' +
+                'Tudo com contrato formal.\n\n➡️ Digite *0* para voltar ao menu.'
             );
             break;
         case '6':
@@ -176,12 +173,12 @@ async function handleMenu(msg) {
                 '1 - Marino Barros\n' +
                 '2 - Samuel Calazans\n' +
                 '3 - Flávio Barros\n' +
-                '4 - Sem preferência'
+                '4 - Sem preferência\n\n➡️ Digite *0* para voltar ao menu.'
             );
             userStates.set(msg.from, "escolherFuncionario");
             break;
         default:
-            // não faz nada se opção inválida
+            await client.sendMessage(msg.from, "❌ Opção inválida.\n\n➡️ Digite *0* para voltar ao menu.");
             break;
     }
 }
@@ -192,7 +189,13 @@ client.on('message', async msg => {
     const userState = userStates.get(userId) || "novo";
     const text = msg.body.toLowerCase();
 
-    // ======= SE USUÁRIO JÁ ESTÁ EM CONVERSA =======
+    if (msg.fromMe) return; //se eu mandar mensagem, ele ignora.
+
+    if (msg.body.trim() === '0' && userId.endsWith('@c.us')) {
+        await sendIntro(msg);
+        return; //opção para voltar ao menu
+    }
+
     if (userState !== "novo" && userId.endsWith('@c.us')) {
         if (userState === "escolherFuncionario") {
             await handleFuncionario(msg);

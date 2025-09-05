@@ -1,20 +1,22 @@
 const qrcode = require('qrcode-terminal');
-const { Client, LocalAuth, Buttons, List, MessageMedia } = require('whatsapp-web.js');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 
 // ====== INICIALIZAÇÃO ======
 const client = new Client({
-    authStrategy: new LocalAuth(), // mantém sessão salva
+    authStrategy: new LocalAuth(), 
     puppeteer: { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] }
 });
 
-const delay = ms => new Promise(res => setTimeout(res, ms)); //delay
+const delay = ms => new Promise(res => setTimeout(res, ms));
 
 // ====== ESTADOS E COOLDOWNS ======
 const userCooldowns = new Map(); // { '551199999999@c.us': timestamp }
-const userStates = new Map(); // { '551199999999@c.us': 'menu' }
+const userStates = new Map();    // { '551199999999@c.us': 'menu' | 'escolherFuncionario' | 'handover' | 'novo' }
 const userInitiated = new Map(); // marca se o usuário iniciou a conversa
+const triggerKeywords = ['olá','ola','oi','dia','tarde','noite','atendimento'];
 
-const triggerKeywords = ['olá', 'Olá', 'ola', 'Ola', 'Oi', 'oi', 'dia', 'tarde', 'noite', 'atendimento']; //palavras que ativam o bot
+let reconnectAttempts = 0;
+const MAX_RECONNECT = 5;
 
 // ====== EVENTOS DE CONEXÃO ======
 client.on('qr', qr => {
@@ -22,6 +24,7 @@ client.on('qr', qr => {
 });
 
 client.on('ready', async () => {
+    reconnectAttempts = 0; // zera tentativas
     console.log('✅ Tudo certo! WhatsApp conectado.');
 
     const chats = await client.getChats();
@@ -31,20 +34,21 @@ client.on('ready', async () => {
     grupos.forEach(group => {
         console.log(`${group.name} -> ${group.id._serialized}`);
     });
-
-    console.log("⚠️ Copie o ID do grupo desejado e substitua no switch (case '4').");
 });
 
-// reconexão automática
 client.on('disconnected', (reason) => {
     console.log('❌ Cliente desconectado:', reason);
-    client.initialize();
+    if (reconnectAttempts < MAX_RECONNECT) {
+        reconnectAttempts++;
+        console.log(`🔄 Tentando reconectar... (${reconnectAttempts}/${MAX_RECONNECT})`);
+        setTimeout(() => client.initialize(), 5000);
+    } else {
+        console.log("🚫 Limite de tentativas atingido. Reinicie manualmente.");
+    }
 });
 
-// captura erros para não derrubar
 process.on('uncaughtException', (err) => {
     console.error('❌ Erro não tratado:', err);
-    client.initialize();
 });
 
 process.on('unhandledRejection', (reason, promise) => {
@@ -69,7 +73,7 @@ async function sendIntro(msg) {
         `2 - Como funciona nossa assessoria?\n` +
         `3 - Participar do grupo para receber as melhores oportunidades de imóveis\n` +
         `4 - Nossas redes sociais\n` +
-        `5 - Qual o valor da acessoria?\n` +
+        `5 - Qual o valor da assessoria?\n` +
         `6 - Atendimento Humanizado\n\n` +
         `➡️ Digite *0* a qualquer momento para voltar a este menu.`
     );
@@ -97,7 +101,7 @@ async function handleFuncionario(msg) {
             break;
         case '4':
             funcionario = "Sem preferência";
-            funcionarioNum = "120363362518310323@g.us"; // id de grupo
+            funcionarioNum = "120363362518310323@g.us"; 
             break;
         default:
             await client.sendMessage(msg.from, "❌ Opção inválida. Digite apenas 1, 2, 3 ou 4\n\n➡️ Digite *0* para voltar ao menu.");
@@ -124,9 +128,8 @@ async function handleFuncionario(msg) {
         `Deseja falar com: ${funcionario}`
     );
 
-    // Reinicia o estado do usuário
-    userStates.set(msg.from, "novo");
-    userCooldowns.set(msg.from, 0);
+    // Estado de handover -> o bot para de responder até reset
+    userStates.set(msg.from, "handover");
 }
 
 // ====== MENU PRINCIPAL ======
@@ -136,71 +139,55 @@ async function handleMenu(msg) {
 
     switch (option) {
         case '1':
-            await chat.sendStateTyping();
-            await delay(2000);
-            await client.sendMessage(
-                msg.from,
+            await chat.sendStateTyping(); await delay(2000);
+            await client.sendMessage(msg.from,
                 '🏠 Leilão de imóveis é uma forma de comprar imóveis por preços abaixo do mercado.\n' +
-                '⚖️ Pode ser judicial (quando o bem é penhorado por dívidas) ou extrajudicial (quando o banco retoma por falta de pagamento).\n' +
-                '📌 Funciona assim: é publicado um edital → acontece o 1º leilão (valor de avaliação) → se não vender, vai para o 2º leilão (valor mínimo menor).\n' +
+                '⚖️ Pode ser judicial ou extrajudicial.\n' +
+                '📌 Edital → 1º leilão (avaliação) → 2º leilão (valor menor).\n' +
                 '💰 Quem dá o maior lance, leva.\n\n➡️ Digite *0* para voltar ao menu.'
             );
             break;
         case '2':
-            await chat.sendStateTyping();
-            await delay(2000);
-            await client.sendMessage(
-                msg.from,
-                'Nossa assessoria te acompanha em todas as etapas do processo:\n' +
-                '🧐 Analisamos o edital e os riscos;\n' +
-                '🎯 Montamos estratégia de lance personalizada;\n' +
-                '📌 Ajudamos você a se cadastrar no site do leiloeiro;\n' +
-                '🤝 Acompanhamos até você conseguir a posse do imóvel.\n\n' +
+            await chat.sendStateTyping(); await delay(2000);
+            await client.sendMessage(msg.from,
+                'Nossa assessoria te acompanha em todas as etapas:\n' +
+                '🧐 Analisamos o edital;\n🎯 Montamos estratégia;\n📌 Auxiliamos cadastro;\n🤝 Acompanhamos até a posse.\n\n' +
                 'Você só paga se arrematar!\n\n➡️ Digite *0* para voltar ao menu.'
             );
             break;
         case '3':
-            await chat.sendStateTyping();
-            await delay(2000);
+            await chat.sendStateTyping(); await delay(2000);
             await client.sendMessage(msg.from, 'Seja bem-vindo(a) ao nosso grupo!!');
             await client.sendMessage(msg.from, '👉 Link: https://chat.whatsapp.com/FDTNyTiSibq6Qq2l6csJpw\n\n➡️ Digite *0* para voltar ao menu.');
             break;
         case '4':
-            await chat.sendStateTyping();
-            await delay(1000);
+            await chat.sendStateTyping(); await delay(1000);
             await client.sendMessage(msg.from, 'Aqui estão nossas redes sociais:');
             await client.sendMessage(msg.from, 'Instagram: https://www.instagram.com/doulhe_3_arrematei');
             await client.sendMessage(msg.from, 'Facebook: https://www.facebook.com/profile.php?id=61567777044020');
             await client.sendMessage(msg.from, 'Site: https://www.doulhe3arrematei.com.br/\n\n➡️ Digite *0* para voltar ao menu.');
             break;
         case '5':
-            await chat.sendStateTyping();
-            await delay(2000);
-            await client.sendMessage(
-                msg.from,
-                'O valor da nossa assessoria varia conforme o imóvel:\n\n' +
-                '- Até R$ 500.000,00: 10% sobre o arremate\n' +
-                '- Acima de R$ 500.000,00: 5% sobre o arremate\n\n' +
-                'Se não arrematar, não paga nada.\n' +
-                'Tudo com contrato formal.\n\n➡️ Digite *0* para voltar ao menu.'
+            await chat.sendStateTyping(); await delay(2000);
+            await client.sendMessage(msg.from,
+                'O valor da nossa assessoria varia:\n\n' +
+                '- Até R$ 500.000: 10% sobre o arremate\n' +
+                '- Acima de R$ 500.000: 5% sobre o arremate\n\n' +
+                'Se não arrematar, não paga nada.\n\n➡️ Digite *0* para voltar ao menu.'
             );
             break;
         case '6':
-            await chat.sendStateTyping();
-            await delay(2000);
-            await client.sendMessage(
-                msg.from,
-                '🤝 Atendimento Humanizado confirmado!\n\n' +
-                'Com qual dos nossos atendentes você gostaria de falar?\n' +
-                '1 - Marino Barros\n' +
-                '2 - Samuel Calazans\n' +
-                '3 - Flávio Barros\n' +
-                '4 - Sem preferência\n\n➡️ Digite *0* para voltar ao menu.'
+            await chat.sendStateTyping(); await delay(2000);
+            await client.sendMessage(msg.from,
+                '🤝 Atendimento Humanizado!\n\n' +
+                '1 - Marino Barros\n2 - Samuel Calazans\n3 - Flávio Barros\n4 - Sem preferência\n\n➡️ Digite *0* para voltar ao menu.'
             );
             userStates.set(msg.from, "escolherFuncionario");
             break;
         default:
-            await client.sendMessage(msg.from, "❌ Opção inválida.\n\n➡️ Digite *0* para voltar ao menu.");
+            await client.sendMessage(msg.from, 
+                "❌ Não entendi sua mensagem.\n\nDigite um número do menu ou *0* para voltar.\nSe preferir, digite *6* para falar com um atendente."
+            );
             break;
     }
 }
@@ -213,25 +200,31 @@ client.on('message', async msg => {
 
     if (msg.fromMe) return; // ignora mensagens do próprio bot
 
+    // Cooldown de 20 segundos
+    const cooldown = 20 * 1000; 
+    const lastMsg = userCooldowns.get(userId) || 0;
+    if (Date.now() - lastMsg < cooldown && userState !== "handover") return;
+
     if (msg.body.trim() === '0' && userId.endsWith('@c.us')) {
         await sendIntro(msg);
         return;
     }
 
-    if (userState !== "novo" && userId.endsWith('@c.us')) {
-        if (userState === "escolherFuncionario") {
-            await handleFuncionario(msg);
-        } else if (userState === "menu") {
-            await handleMenu(msg);
-        }
+    // Se está em atendimento humano, o bot não responde
+    if (userState === "handover") return;
+
+    if (userState === "escolherFuncionario") {
+        await handleFuncionario(msg);
+        return;
+    } else if (userState === "menu") {
+        await handleMenu(msg);
+        userCooldowns.set(userId, Date.now());
         return;
     }
 
-    // ======= CHECA SE O USUÁRIO INICIOU A CONVERSA =======
+    // ======= PRIMEIRA INTERAÇÃO =======
     if (!userInitiated.get(userId)) {
         userInitiated.set(userId, true);
-
-        // ======= CHECA PALAVRA-CHAVE PARA ATIVAR O BOT =======
         const hasTrigger = triggerKeywords.some(keyword => text.includes(keyword));
         if (hasTrigger && userState === "novo" && userId.endsWith('@c.us')) {
             await sendIntro(msg);

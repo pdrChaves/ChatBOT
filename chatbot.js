@@ -1,6 +1,11 @@
 const qrcode = require('qrcode-terminal');
-const { Client, Buttons, List, MessageMedia } = require('whatsapp-web.js');
-const client = new Client();
+const { Client, LocalAuth, Buttons, List, MessageMedia } = require('whatsapp-web.js');
+
+// ====== INICIALIZAÇÃO ======
+const client = new Client({
+    authStrategy: new LocalAuth(), // mantém sessão salva
+    puppeteer: { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] }
+});
 
 const delay = ms => new Promise(res => setTimeout(res, ms)); //delay
 
@@ -9,11 +14,12 @@ const userCooldowns = new Map(); // { '551199999999@c.us': timestamp }
 const userStates = new Map(); // { '551199999999@c.us': 'menu' }
 const userInitiated = new Map(); // marca se o usuário iniciou a conversa
 
-const triggerKeywords = ['olá', 'Olá', 'ola', 'Ola', 'Oi',  'oi', 'dia', 'tarde', 'noite', 'atendimento']; //palavras que ativam o bot
+const triggerKeywords = ['olá', 'Olá', 'ola', 'Ola', 'Oi', 'oi', 'dia', 'tarde', 'noite', 'atendimento']; //palavras que ativam o bot
 
+// ====== EVENTOS DE CONEXÃO ======
 client.on('qr', qr => {
     qrcode.generate(qr, { small: true });
-}); //qr code para conectar
+});
 
 client.on('ready', async () => {
     console.log('✅ Tudo certo! WhatsApp conectado.');
@@ -27,6 +33,22 @@ client.on('ready', async () => {
     });
 
     console.log("⚠️ Copie o ID do grupo desejado e substitua no switch (case '4').");
+});
+
+// reconexão automática
+client.on('disconnected', (reason) => {
+    console.log('❌ Cliente desconectado:', reason);
+    client.initialize();
+});
+
+// captura erros para não derrubar
+process.on('uncaughtException', (err) => {
+    console.error('❌ Erro não tratado:', err);
+    client.initialize();
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('⚠️ Promessa rejeitada:', promise, 'Motivo:', reason);
 });
 
 client.initialize();
@@ -47,7 +69,7 @@ async function sendIntro(msg) {
         `2 - Como funciona nossa assessoria?\n` +
         `3 - Participar do grupo para receber as melhores oportunidades de imóveis\n` +
         `4 - Nossas redes sociais\n` +
-        `5 - Quanto é o investimento em nossos serviços?\n` +
+        `5 - Qual o valor da acessoria?\n` +
         `6 - Atendimento Humanizado\n\n` +
         `➡️ Digite *0* a qualquer momento para voltar a este menu.`
     );
@@ -75,7 +97,7 @@ async function handleFuncionario(msg) {
             break;
         case '4':
             funcionario = "Sem preferência";
-            funcionarioNum = "120363362518310323@g.us";
+            funcionarioNum = "120363362518310323@g.us"; // id de grupo
             break;
         default:
             await client.sendMessage(msg.from, "❌ Opção inválida. Digite apenas 1, 2, 3 ou 4\n\n➡️ Digite *0* para voltar ao menu.");
@@ -189,11 +211,11 @@ client.on('message', async msg => {
     const userState = userStates.get(userId) || "novo";
     const text = msg.body.toLowerCase();
 
-    if (msg.fromMe) return; //se eu mandar mensagem, ele ignora.
+    if (msg.fromMe) return; // ignora mensagens do próprio bot
 
     if (msg.body.trim() === '0' && userId.endsWith('@c.us')) {
         await sendIntro(msg);
-        return; //opção para voltar ao menu
+        return;
     }
 
     if (userState !== "novo" && userId.endsWith('@c.us')) {
@@ -207,7 +229,6 @@ client.on('message', async msg => {
 
     // ======= CHECA SE O USUÁRIO INICIOU A CONVERSA =======
     if (!userInitiated.get(userId)) {
-        // Usuário enviou a primeira mensagem
         userInitiated.set(userId, true);
 
         // ======= CHECA PALAVRA-CHAVE PARA ATIVAR O BOT =======

@@ -138,18 +138,24 @@ async function handleMenu(msg) {
         case '1':
             await chat.sendStateTyping(); await delay(2000);
             await client.sendMessage(msg.from,
-                '🏠 Leilão de imóveis é uma forma de comprar imóveis por preços abaixo do mercado.\n' +
-                '⚖️ Pode ser judicial ou extrajudicial.\n' +
-                '📌 Edital → 1º leilão (avaliação) → 2º leilão (valor menor).\n' +
-                '💰 Quem dá o maior lance, leva.\n\n➡️ Digite *0* para voltar ao menu.'
+                '🏠 Leilão de imóveis é uma forma de comprar imóveis por preços abaixo do mercado.\n'+
+                '⚖️ Pode ser judicial (quando o bem é penhorado por dívidas) ou extrajudicial (quando o banco retoma por falta de pagamento).\n'+
+                '📌 Funciona assim: é publicado um edital → acontece o 1º leilão (valor de avaliação) → se não vender, vai para o 2º leilão (valor mínimo menor).'+
+                '\n💰 Quem dá o maior lance, leva.\n\n'+
+                '➡️ Digite 0 para voltar ao menu.'
             );
             break;
         case '2':
             await chat.sendStateTyping(); await delay(2000);
             await client.sendMessage(msg.from,
-                'Nossa assessoria te acompanha em todas as etapas:\n' +
-                '🧐 Analisamos o edital;\n🎯 Montamos estratégia;\n📌 Auxiliamos cadastro;\n🤝 Acompanhamos até a posse.\n\n' +
-                'Você só paga se arrematar!\n\n➡️ Digite *0* para voltar ao menu.'
+                'Nossa assessoria te acompanha e orienta em todas as etapas do processo:\n'+
+                '🧐 Fazemos uma análise minuciosa do edital, identificando todos os pontos importantes, possíveis pendências e riscos do imóvel;\n'+
+                '🎯 Montamos uma estratégia de lance personalizada;\n'+
+                '📝 Formalizamos tudo com contrato e transparência;\n'+
+                '📌 Ajudamos você a se cadastrar no site do leiloeiro;\n'+
+                '🤝 Acompanhamos até você conseguir a posse do imóvel.\n\n'+
+                'É um serviço completo e você só paga se arrematar!\n'+
+                'Digite *0* para voltar ao menu.'
             );
             break;
         case '3':
@@ -159,15 +165,19 @@ async function handleMenu(msg) {
             break;
         case '4':
             await chat.sendStateTyping(); await delay(1000);
-            await client.sendMessage(msg.from, 'Aqui estão nossas redes sociais: \nInstagram: https://www.instagram.com/doulhe_3_arrematei \nFacebook: https://www.facebook.com/profile.php?id=61567777044020 \nSite: https://www.doulhe3arrematei.com.br/\n\n➡️ Digite *0* para voltar ao menu.');
+            await client.sendMessage(msg.from, 'Aqui estão nossas redes sociais: \nInstagram: https://www.instagram.com/doulhe_3_arrematei \n'+
+                'Facebook: https://www.facebook.com/profile.php?id=61567777044020\n'+
+                'Site: https://www.doulhe3arrematei.com.br/\n\n'+
+                '➡️ Digite *0* para voltar ao menu.');
             break;
         case '5':
             await chat.sendStateTyping(); await delay(2000);
             await client.sendMessage(msg.from,
-                'O valor da nossa assessoria varia:\n\n' +
-                '- Até R$ 500.000: 10% sobre o arremate\n' +
-                '- Acima de R$ 500.000: 5% sobre o arremate\n\n' +
-                'Se não arrematar, não paga nada.\n\n➡️ Digite *0* para voltar ao menu.'
+                'O valor da nossa assessoria varia conforme o valor do imóvel:\n\n'+
+                '- Imóveis de até R$ 500.000,00: cobramos 10% sobre o valor arrematado\n'+
+                '- Imóveis acima de R$ 500.000,00: cobramos 5% sobre o valor arrematado\n\n'+
+                'Se o imóvel não for arrematado, você não paga nada.\n'+
+                'Tudo formalizado com contrato de prestação de serviços.'
             );
             break;
         case '6':
